@@ -1,0 +1,553 @@
+{
+  "site_name": "Jimeng AI",
+  "source_url": "https://jimeng.jianying.com/ai-tool/home?type=image&workspace=undefined",
+  "source_html": "/Users/mac/App/vibeui/uiclone/test_outputs/clone-jimeng-jianying.html",
+  "html_title": "即梦AI - 一站式AI创作平台",
+  "palette": {
+    "background": "#22252a",
+    "text": "rgba(224, 245, 255, 0.6)",
+    "surface": "rgba(204, 221, 255, 0.078)",
+    "border": "#f53f3f",
+    "accents": [
+      "rgba(224, 245, 255, 0.349)",
+      "#0f0f12",
+      "#00cae0",
+      "rgba(204, 221, 255, 0.059)"
+    ],
+    "neutrals": [
+      "#f5fbff",
+      "#ffffff",
+      "rgba(255, 255, 255, 0.12)",
+      "#e5e6eb",
+      "rgba(255, 255, 255, 0)",
+      "#000000"
+    ]
+  },
+  "fonts": {
+    "primary": "PingFang SC",
+    "mono": "PingFang SC",
+    "all": [
+      "PingFang SC",
+      "Montserrat",
+      "var(--alphanumeric-font-family)",
+      "PingFang SC, sans-serif",
+      "Founder Yashi Black",
+      "var(--font-family)",
+      "Founder Yashi Black, var(--font-family)",
+      "Montserrat, sans-serif"
+    ]
+  },
+  "top_colors": [
+    {
+      "value": "#f5fbff",
+      "count": 688
+    },
+    {
+      "value": "rgba(204, 221, 255, 0.078)",
+      "count": 456
+    },
+    {
+      "value": "#ffffff",
+      "count": 336
+    },
+    {
+      "value": "rgba(224, 245, 255, 0.6)",
+      "count": 262
+    },
+    {
+      "value": "rgba(255, 255, 255, 0.12)",
+      "count": 232
+    },
+    {
+      "value": "rgba(224, 245, 255, 0.349)",
+      "count": 222
+    },
+    {
+      "value": "#e5e6eb",
+      "count": 209
+    },
+    {
+      "value": "rgba(255, 255, 255, 0)",
+      "count": 180
+    },
+    {
+      "value": "#0f0f12",
+      "count": 158
+    },
+    {
+      "value": "#00cae0",
+      "count": 149
+    },
+    {
+      "value": "#000000",
+      "count": 123
+    },
+    {
+      "value": "rgba(204, 221, 255, 0.059)",
+      "count": 115
+    },
+    {
+      "value": "#22252a",
+      "count": 108
+    },
+    {
+      "value": "#15161a",
+      "count": 102
+    },
+    {
+      "value": "#1d2129",
+      "count": 100
+    },
+    {
+      "value": "#f2f3f5",
+      "count": 89
+    },
+    {
+      "value": "rgba(224, 245, 255, 0.478)",
+      "count": 85
+    },
+    {
+      "value": "#ebf8ff",
+      "count": 78
+    },
+    {
+      "value": "rgba(224, 245, 255, 0.2)",
+      "count": 78
+    },
+    {
+      "value": "rgba(204, 221, 255, 0.122)",
+      "count": 76
+    }
+  ],
+  "font_sizes": [
+    {
+      "value": "292px",
+      "count": 1
+    },
+    {
+      "value": "224px",
+      "count": 2
+    },
+    {
+      "value": "112px",
+      "count": 2
+    },
+    {
+      "value": "56px",
+      "count": 2
+    },
+    {
+      "value": "48px",
+      "count": 2
+    },
+    {
+      "value": "42px",
+      "count": 1
+    },
+    {
+      "value": "40px",
+      "count": 2
+    },
+    {
+      "value": "36px",
+      "count": 8
+    },
+    {
+      "value": "34px",
+      "count": 2
+    },
+    {
+      "value": "32px",
+      "count": 9
+    },
+    {
+      "value": "2em",
+      "count": 2
+    },
+    {
+      "value": "28px",
+      "count": 7
+    }
+  ],
+  "font_weights": [
+    {
+      "value": "500",
+      "count": 417
+    },
+    {
+      "value": "400",
+      "count": 410
+    },
+    {
+      "value": "600",
+      "count": 67
+    },
+    {
+      "value": "700",
+      "count": 44
+    },
+    {
+      "value": "800",
+      "count": 7
+    },
+    {
+      "value": "300",
+      "count": 1
+    },
+    {
+      "value": "900",
+      "count": 1
+    }
+  ],
+  "line_heights": [
+    {
+      "value": "22px",
+      "count": 193
+    },
+    {
+      "value": "20px",
+      "count": 168
+    },
+    {
+      "value": "24px",
+      "count": 50
+    },
+    {
+      "value": "1.5715",
+      "count": 44
+    },
+    {
+      "value": "1",
+      "count": 39
+    },
+    {
+      "value": "var(--lvv-line-height-body-2)",
+      "count": 32
+    },
+    {
+      "value": "16px",
+      "count": 30
+    },
+    {
+      "value": "32px",
+      "count": 30
+    },
+    {
+      "value": "36px",
+      "count": 27
+    },
+    {
+      "value": "var(--content-generator-prompt-control-line-height)",
+      "count": 25
+    },
+    {
+      "value": "0",
+      "count": 22
+    },
+    {
+      "value": "14px",
+      "count": 20
+    }
+  ],
+  "letter_spacings": [
+    {
+      "value": "0",
+      "count": 14
+    },
+    {
+      "value": ".161px",
+      "count": 5
+    },
+    {
+      "value": ".03px",
+      "count": 3
+    },
+    {
+      "value": ".094px",
+      "count": 2
+    },
+    {
+      "value": ".3em",
+      "count": 2
+    },
+    {
+      "value": "-.029px",
+      "count": 1
+    },
+    {
+      "value": ".07em",
+      "count": 1
+    },
+    {
+      "value": ".209px",
+      "count": 1
+    },
+    {
+      "value": ".32px",
+      "count": 1
+    },
+    {
+      "value": ".36px",
+      "count": 1
+    },
+    {
+      "value": ".418px",
+      "count": 1
+    },
+    {
+      "value": "1px",
+      "count": 1
+    }
+  ],
+  "radii": [
+    "999px",
+    "50em",
+    "400px",
+    "100px",
+    "99px",
+    "96px",
+    "80px",
+    "64px"
+  ],
+  "shadows": [
+    "none",
+    "none!important",
+    "var(--shadow-dropdown-menu)",
+    "0 6px 16px rgba(4,4,4,.06)",
+    "var(--shadow-generator-float-block)",
+    "0 4px 10px rgba(0,0,0,.1)"
+  ],
+  "spacing": [
+    "154px",
+    "147px",
+    "128px",
+    "120px",
+    "108px",
+    "100px",
+    "88px",
+    "76px",
+    "72px",
+    "65px"
+  ],
+  "max_widths": [
+    "1920px",
+    "1352px",
+    "1200px",
+    "1024px",
+    "1000px",
+    "936px"
+  ],
+  "breakpoints": [
+    "max:626px",
+    "max:860px",
+    "max:1536px",
+    "max:810px",
+    "max:1920px",
+    "max:1279px",
+    "max:2199px",
+    "max:1800px"
+  ],
+  "custom_properties": [
+    {
+      "value": "--content-generator-max-width",
+      "count": 16
+    },
+    {
+      "value": "--tiled-reference-group-max-width",
+      "count": 16
+    },
+    {
+      "value": "--carousel-card-gap",
+      "count": 14
+    },
+    {
+      "value": "--menu-icon-size",
+      "count": 9
+    },
+    {
+      "value": "--content-generator-min-width",
+      "count": 8
+    },
+    {
+      "value": "--content-generator-prompt-input-vertical-offset",
+      "count": 8
+    },
+    {
+      "value": "--index",
+      "count": 8
+    },
+    {
+      "value": "--lvv-color-bg-5",
+      "count": 8
+    },
+    {
+      "value": "--lvv-color-bg-6",
+      "count": 8
+    },
+    {
+      "value": "--lvv-color-line-1",
+      "count": 8
+    },
+    {
+      "value": "--lvv-color-line-2",
+      "count": 8
+    },
+    {
+      "value": "--lvv-color-text-inverted",
+      "count": 8
+    },
+    {
+      "value": "--reference-group-collapsed-margin-compensation-factor",
+      "count": 8
+    },
+    {
+      "value": "--reference-group-collapsed-scale",
+      "count": 8
+    },
+    {
+      "value": "--reference-group-content-horizontal-padding",
+      "count": 8
+    },
+    {
+      "value": "--reference-group-content-horizontal-total-padding",
+      "count": 8
+    },
+    {
+      "value": "--reference-item-rotation-compensation-width",
+      "count": 8
+    },
+    {
+      "value": "--tiled-reference-group-content-width",
+      "count": 8
+    },
+    {
+      "value": "--lvv-color-fill-bg-1",
+      "count": 7
+    },
+    {
+      "value": "--lvv-color-fill-bg-2",
+      "count": 7
+    }
+  ],
+  "tag_counts": {
+    "html": 1,
+    "head": 1,
+    "script": 101,
+    "link": 68,
+    "meta": 10,
+    "title": 1,
+    "style": 8,
+    "body": 1,
+    "div": 519,
+    "span": 51,
+    "button": 18,
+    "svg": 53,
+    "g": 53,
+    "path": 55,
+    "img": 55,
+    "input": 7,
+    "p": 14,
+    "br": 4,
+    "h3": 10,
+    "iframe": 1
+  },
+  "text_samples": {
+    "button": [
+      "一键配置",
+      "智能比例 高清 2K",
+      "去查看",
+      "Octo Beta Vibe create，创作自然流动 Octo Beta Vibe create，创作自然流动",
+      "无限画布 自由创作 无限画布 自由创作",
+      "Agent 模式 S2.0视频创作 Seedance 2.0 全能视频创作",
+      "图片生成 智能美学提升 4.1智能美学 即刻想象",
+      "视频生成 Seedance 2.0 Seedance 2.0 即刻想象",
+      "搜索",
+      "智能比例 高清 2K",
+      "去查看"
+    ],
+    "p": [
+      "上传参考图、输入文字，描述你想生成的图片。",
+      "安慕希整颗蓝莓AI创作大赛",
+      "已有 255 人参与",
+      "哈啤 AI 武林大赛",
+      "已有 1532 人参与",
+      "晶核新职业「枪侍」创作大赛",
+      "已有 658 人参与",
+      "大学生广告艺术节学院奖 即梦AI青年创意大赛（视频类）",
+      "已有 431 人参与",
+      "即梦AI 创作者成长计划 · 新视觉",
+      "即梦AI 创作者成长计划 · 新影像",
+      "上传参考图、输入文字，描述你想生成的图片。"
+    ],
+    "h3": [
+      "Octo Beta",
+      "Octo Beta",
+      "无限画布",
+      "无限画布",
+      "Agent 模式",
+      "Seedance 2.0",
+      "图片生成",
+      "4.1智能美学",
+      "视频生成",
+      "Seedance 2.0"
+    ]
+  },
+  "typography": {
+    "display": {
+      "font": "PingFang SC",
+      "size": "36px",
+      "weight": "500",
+      "line_height": "22px",
+      "letter_spacing": "—",
+      "notes": "Inferred from matching CSS selectors"
+    },
+    "section": {
+      "font": "Montserrat, CapCut Sans, PingFang SC",
+      "size": "32px",
+      "weight": "500",
+      "line_height": "22px",
+      "letter_spacing": "—",
+      "notes": "Inferred from matching CSS selectors"
+    },
+    "subheading": {
+      "font": "PingFang SC",
+      "size": "28px",
+      "weight": "500",
+      "line_height": "20px",
+      "letter_spacing": "—",
+      "notes": "Inferred from matching CSS selectors"
+    },
+    "body": {
+      "font": "PingFang SC",
+      "size": "14px",
+      "weight": "400",
+      "line_height": "22px",
+      "letter_spacing": "0",
+      "notes": "Inferred from matching CSS selectors"
+    },
+    "button": {
+      "font": "PingFang SC",
+      "size": "12px",
+      "weight": "500",
+      "line_height": "22px",
+      "letter_spacing": "—",
+      "notes": "Inferred from matching CSS selectors"
+    },
+    "caption": {
+      "font": "PingFang SC",
+      "size": "10px",
+      "weight": "400",
+      "line_height": "14px",
+      "letter_spacing": "—",
+      "notes": "Inferred from matching CSS selectors"
+    },
+    "code": {
+      "font": "monospace, monospace",
+      "size": "14px",
+      "weight": "400",
+      "line_height": "22px",
+      "letter_spacing": "—",
+      "notes": "Inferred from matching CSS selectors"
+    }
+  }
+}

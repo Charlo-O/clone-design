@@ -1,0 +1,588 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Design System Preview: Jimeng (Dark)</title>
+<style>
+  :root {
+    --page-bg: #1d2129;
+    --page-fg: #f5fbff;
+    --chrome-bg: rgba(29, 33, 41, 0.92);
+    --panel-bg: rgba(34, 37, 42, 0.96);
+    --panel-fg: #f5fbff;
+    --divider: rgba(224, 245, 255, 0.12);
+    --muted: rgba(224, 245, 255, 0.6);
+    --accent: #00a1c2;
+    --accent-alt: #00cae0;
+    --button-bg: #00a1c2;
+    --button-fg: #ffffff;
+    --button-radius: 12px;
+    --button-shadow: none;
+    --card-bg: rgba(204, 221, 255, 0.06);
+    --card-radius: 24px;
+    --card-shadow: none;
+    --input-bg: rgba(34, 37, 42, 0.96);
+    --input-radius: 8px;
+    --input-border: 1px solid rgba(224, 245, 255, 0.12);
+    --font-primary: "CapCut Sans", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+    --font-mono: Montserrat, "CapCut Sans", "PingFang SC", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--page-bg);
+    color: var(--page-fg);
+    font-family: var(--font-primary);
+    line-height: 1.5;
+  }
+  a { color: inherit; text-decoration: none; }
+  .nav {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 24px;
+    background: var(--chrome-bg);
+    border-bottom: 1px solid var(--divider);
+    backdrop-filter: blur(18px);
+  }
+  .nav-brand { font-size: 14px; font-weight: 700; letter-spacing: 0.02em; }
+  .nav-links { display: flex; gap: 16px; color: var(--muted); font-size: 14px; }
+  .nav-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #0f172a;
+    font-weight: 700;
+  }
+  .hero {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 72px 24px 40px;
+  }
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--divider);
+    color: var(--muted);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .hero h1 {
+    margin: 20px 0 14px;
+    font-size: clamp(2.2rem, 5vw, 4.5rem);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+  }
+  .hero p {
+    max-width: 760px;
+    margin: 0 0 24px;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+  .hero-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border-radius: var(--button-radius);
+    background: var(--button-bg);
+    color: var(--button-fg);
+    box-shadow: var(--button-shadow);
+    font-weight: 600;
+  }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 18px;
+    border-radius: var(--button-radius);
+    border: 1px solid #f53f3f;
+    color: var(--page-fg);
+    background: transparent;
+  }
+  .section {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+  }
+  .section-header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+  .section-label {
+    color: var(--muted);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .section-title {
+    font-size: 1.4rem;
+    margin: 4px 0 0;
+  }
+  .divider {
+    max-width: 1100px;
+    margin: 0 auto;
+    border: 0;
+    border-top: 1px solid var(--divider);
+  }
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 14px;
+  }
+  .color-card, .panel {
+    background: var(--panel-bg);
+    color: var(--panel-fg);
+    border-radius: 18px;
+    border: 1px solid var(--divider);
+    overflow: hidden;
+  }
+  .swatch { height: 88px; }
+  .swatch-meta { padding: 12px; }
+  .swatch-name { font-weight: 700; }
+  .swatch-value {
+    margin-top: 4px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .swatch-role { margin-top: 4px; color: var(--muted); font-size: 12px; }
+  .type-list { display: grid; gap: 12px; }
+  .type-row {
+    padding: 16px;
+    border-radius: 18px;
+    background: var(--panel-bg);
+    color: var(--panel-fg);
+    border: 1px solid var(--divider);
+  }
+  .type-meta {
+    margin-top: 8px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .component-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+  }
+  .panel { padding: 18px; }
+  .panel h3 { margin: 0 0 12px; }
+  .button-stack, .breakpoints {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .mini-card {
+    background: var(--card-bg);
+    color: #0f172a;
+    border-radius: var(--card-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+  }
+  .mini-card-visual {
+    height: 140px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-alt));
+    opacity: 0.9;
+  }
+  .mini-card-body { padding: 16px; }
+  .mini-card p { color: var(--muted); }
+  .input {
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: var(--input-radius);
+    border: 1px solid var(--divider);
+    background: var(--input-bg);
+    color: #0f172a;
+    font: inherit;
+  }
+  .meter-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 12px;
+  }
+  .meter-item, .radius-item, .elevation-card {
+    padding: 16px;
+    border-radius: 18px;
+    background: var(--panel-bg);
+    color: var(--panel-fg);
+    border: 1px solid var(--divider);
+  }
+  .meter-bar {
+    height: 18px;
+    border-radius: 999px;
+    background: var(--accent);
+    margin-bottom: 10px;
+  }
+  .meter-label {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .radius-grid, .elevation-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+  }
+  .radius-box {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, var(--accent), var(--accent-alt));
+    margin-bottom: 10px;
+  }
+  .elevation-title { font-weight: 700; margin-bottom: 8px; }
+  .elevation-value {
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    word-break: break-word;
+  }
+  .breakpoint-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 999px;
+    background: var(--panel-bg);
+    border: 1px solid var(--divider);
+    color: var(--muted);
+    font-family: var(--font-mono);
+    font-size: 12px;
+  }
+  .footer {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .empty-note {
+    color: var(--muted);
+    font-size: 13px;
+  }
+  @media (max-width: 768px) {
+    .nav-links { display: none; }
+    .hero { padding-top: 48px; }
+    .section { padding: 20px 16px; }
+  }
+</style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="nav-brand">jimeng-ai</div>
+    <div class="nav-links">
+      <a href="#colors">Colors</a>
+      <a href="#type">Type</a>
+      <a href="#components">Components</a>
+      <a href="#layout">Layout</a>
+    </div>
+    <a class="nav-chip" href="#hero">D</a>
+  </nav>
+
+  <section class="hero" id="hero">
+    <div class="eyebrow">Generated Dark Preview</div>
+    <h1>Design System Inspired by Jimeng AI</h1>
+    <p>上传参考图、输入文字，描述你想生成的图片。</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#components">一键配置</a>
+      <a class="btn-secondary" href="./DESIGN.md">智能比例 高清 2K</a>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="section" id="colors">
+    <div class="section-header">
+      <div>
+        <div class="section-label">01 / Colors</div>
+        <h2 class="section-title">Extracted Color Roles</h2>
+      </div>
+      <div class="meter-label">https://jimeng.jianying.com/ai-tool/home?type=image&amp;amp;workspace=undefined</div>
+    </div>
+    <div class="color-grid">
+      <div class="color-card">
+          <div class="swatch" style="background:#22252a"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Primary Background</div>
+            <div class="swatch-value">#22252a</div>
+            <div class="swatch-role">Page canvas</div>
+          </div>
+        </div>
+<div class="color-card">
+          <div class="swatch" style="background:rgba(224, 245, 255, 0.6)"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Primary Text</div>
+            <div class="swatch-value">rgba(224, 245, 255, 0.6)</div>
+            <div class="swatch-role">Default text</div>
+          </div>
+        </div>
+<div class="color-card">
+          <div class="swatch" style="background:rgba(204, 221, 255, 0.078)"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Surface</div>
+            <div class="swatch-value">rgba(204, 221, 255, 0.078)</div>
+            <div class="swatch-role">Cards and inner panels</div>
+          </div>
+        </div>
+<div class="color-card">
+          <div class="swatch" style="background:#f53f3f"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Border</div>
+            <div class="swatch-value">#f53f3f</div>
+            <div class="swatch-role">Dividers and containment</div>
+          </div>
+        </div>
+<div class="color-card">
+          <div class="swatch" style="background:rgba(224, 245, 255, 0.349)"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Accent 1</div>
+            <div class="swatch-value">rgba(224, 245, 255, 0.349)</div>
+            <div class="swatch-role">Highlight or CTA</div>
+          </div>
+        </div>
+<div class="color-card">
+          <div class="swatch" style="background:#0f0f12"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Accent 2</div>
+            <div class="swatch-value">#0f0f12</div>
+            <div class="swatch-role">Highlight or CTA</div>
+          </div>
+        </div>
+<div class="color-card">
+          <div class="swatch" style="background:#00cae0"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Accent 3</div>
+            <div class="swatch-value">#00cae0</div>
+            <div class="swatch-role">Highlight or CTA</div>
+          </div>
+        </div>
+<div class="color-card">
+          <div class="swatch" style="background:rgba(204, 221, 255, 0.059)"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Accent 4</div>
+            <div class="swatch-value">rgba(204, 221, 255, 0.059)</div>
+            <div class="swatch-role">Highlight or CTA</div>
+          </div>
+        </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="section" id="type">
+    <div class="section-header">
+      <div>
+        <div class="section-label">02 / Typography</div>
+        <h2 class="section-title">Hierarchy Samples</h2>
+      </div>
+    </div>
+    <div class="type-list">
+      <div class="type-row">
+          <div class="type-sample" style="font-size:36px;font-weight:500;line-height:22px;letter-spacing:normal;font-family:PingFang SC;">
+            Display / Hero
+          </div>
+          <div class="type-meta">36px / 500 / 22px / PingFang SC</div>
+        </div>
+<div class="type-row">
+          <div class="type-sample" style="font-size:32px;font-weight:500;line-height:22px;letter-spacing:normal;font-family:Montserrat, CapCut Sans, PingFang SC;">
+            Section Heading
+          </div>
+          <div class="type-meta">32px / 500 / 22px / Montserrat, CapCut Sans, PingFang SC</div>
+        </div>
+<div class="type-row">
+          <div class="type-sample" style="font-size:28px;font-weight:500;line-height:20px;letter-spacing:normal;font-family:PingFang SC;">
+            Sub-heading
+          </div>
+          <div class="type-meta">28px / 500 / 20px / PingFang SC</div>
+        </div>
+<div class="type-row">
+          <div class="type-sample" style="font-size:14px;font-weight:400;line-height:22px;letter-spacing:0;font-family:PingFang SC;">
+            Body
+          </div>
+          <div class="type-meta">14px / 400 / 22px / PingFang SC</div>
+        </div>
+<div class="type-row">
+          <div class="type-sample" style="font-size:12px;font-weight:500;line-height:22px;letter-spacing:normal;font-family:PingFang SC;">
+            Button / CTA
+          </div>
+          <div class="type-meta">12px / 500 / 22px / PingFang SC</div>
+        </div>
+<div class="type-row">
+          <div class="type-sample" style="font-size:10px;font-weight:400;line-height:14px;letter-spacing:normal;font-family:PingFang SC;">
+            Caption / Label
+          </div>
+          <div class="type-meta">10px / 400 / 14px / PingFang SC</div>
+        </div>
+<div class="type-row">
+          <div class="type-sample" style="font-size:14px;font-weight:400;line-height:22px;letter-spacing:normal;font-family:monospace, monospace;">
+            Code / Mono
+          </div>
+          <div class="type-meta">14px / 400 / 22px / monospace, monospace</div>
+        </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="section" id="components">
+    <div class="section-header">
+      <div>
+        <div class="section-label">03 / Components</div>
+        <h2 class="section-title">Reusable UI Patterns</h2>
+      </div>
+    </div>
+    <div class="component-grid">
+      <div class="panel">
+        <h3>Buttons</h3>
+        <div class="button-stack">
+          <a class="btn-primary" href="#">一键配置</a>
+          <a class="btn-secondary" href="#">智能比例 高清 2K</a>
+          <a class="nav-chip" href="#">&rarr;</a>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Card</h3>
+        <div class="mini-card">
+          <div class="mini-card-visual"></div>
+          <div class="mini-card-body">
+            <strong>Octo Beta</strong>
+            <p>上传参考图、输入文字，描述你想生成的图片。</p>
+          </div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Form Surface</h3>
+        <input class="input" value="一键配置" aria-label="Input sample">
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <section class="section" id="layout">
+    <div class="section-header">
+      <div>
+        <div class="section-label">04 / Layout</div>
+        <h2 class="section-title">Spacing, Radius, and Elevation</h2>
+      </div>
+    </div>
+    <div class="component-grid">
+      <div class="panel">
+        <h3>Spacing Scale</h3>
+        <div class="meter-grid"><div class="meter-item">
+          <div class="meter-bar" style="width:160px;"></div>
+          <div class="meter-label">154px</div>
+        </div>
+<div class="meter-item">
+          <div class="meter-bar" style="width:160px;"></div>
+          <div class="meter-label">147px</div>
+        </div>
+<div class="meter-item">
+          <div class="meter-bar" style="width:160px;"></div>
+          <div class="meter-label">128px</div>
+        </div>
+<div class="meter-item">
+          <div class="meter-bar" style="width:160px;"></div>
+          <div class="meter-label">120px</div>
+        </div>
+<div class="meter-item">
+          <div class="meter-bar" style="width:160px;"></div>
+          <div class="meter-label">108px</div>
+        </div>
+<div class="meter-item">
+          <div class="meter-bar" style="width:160px;"></div>
+          <div class="meter-label">100px</div>
+        </div>
+<div class="meter-item">
+          <div class="meter-bar" style="width:160px;"></div>
+          <div class="meter-label">88px</div>
+        </div>
+<div class="meter-item">
+          <div class="meter-bar" style="width:160px;"></div>
+          <div class="meter-label">76px</div>
+        </div></div>
+      </div>
+      <div class="panel">
+        <h3>Radius Scale</h3>
+        <div class="radius-grid"><div class="radius-item">
+          <div class="radius-box" style="border-radius:999px"></div>
+          <div class="meter-label">999px</div>
+        </div>
+<div class="radius-item">
+          <div class="radius-box" style="border-radius:50em"></div>
+          <div class="meter-label">50em</div>
+        </div>
+<div class="radius-item">
+          <div class="radius-box" style="border-radius:400px"></div>
+          <div class="meter-label">400px</div>
+        </div>
+<div class="radius-item">
+          <div class="radius-box" style="border-radius:100px"></div>
+          <div class="meter-label">100px</div>
+        </div>
+<div class="radius-item">
+          <div class="radius-box" style="border-radius:99px"></div>
+          <div class="meter-label">99px</div>
+        </div>
+<div class="radius-item">
+          <div class="radius-box" style="border-radius:96px"></div>
+          <div class="meter-label">96px</div>
+        </div></div>
+      </div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="panel">
+      <h3>Elevation</h3>
+      <div class="elevation-grid"><div class="elevation-card" style="box-shadow:none">
+          <div class="elevation-title">Elevation 1</div>
+          <div class="elevation-value">none</div>
+        </div>
+<div class="elevation-card" style="box-shadow:none!important">
+          <div class="elevation-title">Elevation 2</div>
+          <div class="elevation-value">none!important</div>
+        </div>
+<div class="elevation-card" style="box-shadow:var(--shadow-dropdown-menu)">
+          <div class="elevation-title">Elevation 3</div>
+          <div class="elevation-value">var(--shadow-dropdown-menu)</div>
+        </div>
+<div class="elevation-card" style="box-shadow:0 6px 16px rgba(4,4,4,.06)">
+          <div class="elevation-title">Elevation 4</div>
+          <div class="elevation-value">0 6px 16px rgba(4,4,4,.06)</div>
+        </div></div>
+    </div>
+    <div style="height:16px"></div>
+    <div class="panel">
+      <h3>Responsive Clues</h3>
+      <div class="breakpoints"><span class="breakpoint-pill">max 626px</span>
+<span class="breakpoint-pill">max 860px</span>
+<span class="breakpoint-pill">max 1536px</span>
+<span class="breakpoint-pill">max 810px</span>
+<span class="breakpoint-pill">max 1920px</span>
+<span class="breakpoint-pill">max 1279px</span>
+<span class="breakpoint-pill">max 2199px</span>
+<span class="breakpoint-pill">max 1800px</span></div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    Preview generated from a cloned HTML snapshot of Jimeng AI. Open <a href="./DESIGN.md">DESIGN.md</a> for the full written system.
+  </footer>
+</body>
+</html>
