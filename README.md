@@ -1,34 +1,38 @@
+[简体中文](./README.md) | [English](./README.en.md)
+
 # clone-design
 
-Turn a website into a reusable `DESIGN.md` bundle.
+将任意网站整理成可复用的 `DESIGN.md` 设计文档包。
 
-`clone-design` is a small repository built for the workflow:
+`clone-design` 适合这条工作流：
 
 ```text
 URL -> UI clone -> self-contained HTML -> clone-design -> design-md/<slug>/
 ```
 
-It focuses on design distillation rather than pixel-perfect cloning. The output is meant to help another agent, designer, or frontend developer recreate the visual language of a site.
+它的重点不是像素级重建，而是把页面里可复用的视觉规则提炼出来，方便后续交给 AI、设计师或前端继续复现和扩展。
 
-The case output follows an `awesome-design-md`-style layout:
+案例输出目录遵循接近 `awesome-design-md` 的结构：
 
 ```text
 design-md/<slug>/
 ```
 
-## What It Produces
+## 产出内容
 
-- `DESIGN.md` with reusable design-system guidance
-- `README.md` for the generated case folder
-- `preview.html` and `preview-dark.html` for token browsing
-- optional `evidence.json` with extracted raw signals
+- `DESIGN.md`：整理后的设计系统说明
+- `README.md`：案例目录说明
+- `preview.html`：亮色设计 Token 预览
+- `preview-dark.html`：暗色设计 Token 预览
+- `evidence.json`：可选的原始提取证据
 
-## Repo Layout
+## 仓库结构
 
 ```text
 clone-design/
   SKILL.md
   README.md
+  README.en.md
   scripts/
     generate_design_md.py
   design-md/
@@ -45,11 +49,11 @@ clone-design/
       homepage.png
 ```
 
-## Quick Start
+## 快速开始
 
-1. Create a self-contained page snapshot.
-   Best source: a browser-rendered `clone.html` from `frontend-ui-clone` or an equivalent Playwright capture.
-2. Run the generator:
+1. 先准备一个自包含页面快照。
+   最理想的输入是通过 `frontend-ui-clone` 或 Playwright 之类方式拿到的 `clone.html`。
+2. 运行生成脚本：
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -60,32 +64,30 @@ python3 scripts/generate_design_md.py \
   --json-out design-md/jimeng/evidence.json
 ```
 
-3. Review the generated `DESIGN.md` and refine anything that should be marked as inferred instead of observed.
+3. 打开生成后的 `DESIGN.md`，把不够确定的描述明确标注为 inferred，而不是 observed。
 
-## Install As A Skill
+## 作为 Skill 使用
 
-Clone the repository and place it in your local skills directory, or copy the folder directly into a skill workspace.
-
-For local use, the key files are:
+你可以直接把这个仓库放进本地技能目录，或者按需复制下面这些核心文件：
 
 - `SKILL.md`
 - `scripts/generate_design_md.py`
-- the optional example folders under `design-md/` and `captures/`
+- `design-md/` 和 `captures/` 下的示例内容
 
-## Included Example
+## 已包含案例
 
-This repository already includes one complete case:
+当前仓库已内置一套完整案例：
 
-- [jimeng bundle](./design-md/jimeng/)
-- [jimeng capture](./captures/jimeng/)
+- [jimeng 设计产物](./design-md/jimeng/)
+- [jimeng 抓取材料](./captures/jimeng/)
 
-The example shows both sides of the workflow:
+这套案例同时保留了两部分内容：
 
-- the browser-derived source artifacts in `captures/jimeng/`
-- the final reusable design bundle in `design-md/jimeng/`
+- `captures/jimeng/`：浏览器抓取得到的源材料
+- `design-md/jimeng/`：最终整理出的设计文档包
 
-## Notes
+## 说明
 
-- Best results come from a good self-contained clone.
-- The extractor reads HTML and CSS signals; it does not fully reconstruct runtime-only UI states.
-- Mood, token roles, and component naming may require a final human pass.
+- 输入的 `clone.html` 质量越高，输出结果越可靠。
+- 提取器主要读取 HTML 与 CSS 信号，无法完整恢复仅存在于运行时的动态状态。
+- 情绪判断、Token 角色命名和组件分类，仍建议做一次人工复核。

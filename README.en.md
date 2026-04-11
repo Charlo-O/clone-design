@@ -1,0 +1,93 @@
+[简体中文](./README.md) | [English](./README.en.md)
+
+# clone-design
+
+Turn any website into a reusable `DESIGN.md` bundle.
+
+`clone-design` is built for this workflow:
+
+```text
+URL -> UI clone -> self-contained HTML -> clone-design -> design-md/<slug>/
+```
+
+It focuses on design distillation rather than pixel-perfect reconstruction. The goal is to extract reusable visual rules that another agent, designer, or frontend developer can build on.
+
+The case output follows an `awesome-design-md`-style structure:
+
+```text
+design-md/<slug>/
+```
+
+## What It Produces
+
+- `DESIGN.md`: distilled design-system guidance
+- `README.md`: case-level bundle notes
+- `preview.html`: light token preview
+- `preview-dark.html`: dark token preview
+- `evidence.json`: optional extracted evidence
+
+## Repo Layout
+
+```text
+clone-design/
+  SKILL.md
+  README.md
+  README.en.md
+  scripts/
+    generate_design_md.py
+  design-md/
+    jimeng/
+      DESIGN.md
+      README.md
+      preview.html
+      preview-dark.html
+      evidence.json
+  captures/
+    jimeng/
+      clone.html
+      live.json
+      homepage.png
+```
+
+## Quick Start
+
+1. Prepare a self-contained page snapshot.
+   The best input is a `clone.html` captured through `frontend-ui-clone` or a similar Playwright workflow.
+2. Run the generator:
+
+```bash
+python3 scripts/generate_design_md.py \
+  captures/jimeng/clone.html \
+  --name "Jimeng AI" \
+  --url "https://jimeng.jianying.com/ai-tool/home?type=image&workspace=undefined" \
+  --out-dir design-md/jimeng \
+  --json-out design-md/jimeng/evidence.json
+```
+
+3. Review the generated `DESIGN.md` and mark uncertain statements as inferred rather than observed.
+
+## Use As A Skill
+
+You can place this repository in a local skill directory, or copy the core files you need:
+
+- `SKILL.md`
+- `scripts/generate_design_md.py`
+- the example content under `design-md/` and `captures/`
+
+## Included Example
+
+The repository currently includes one complete example:
+
+- [jimeng design bundle](./design-md/jimeng/)
+- [jimeng capture artifacts](./captures/jimeng/)
+
+This example preserves both sides of the workflow:
+
+- `captures/jimeng/`: browser-derived source material
+- `design-md/jimeng/`: final distilled design bundle
+
+## Notes
+
+- Better `clone.html` input leads to better output.
+- The extractor reads HTML and CSS signals; it does not fully reconstruct runtime-only interaction states.
+- Mood, token roles, and component taxonomy should still get a final human review.
