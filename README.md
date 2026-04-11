@@ -4,13 +4,13 @@
 
 将任意网站整理成可复用的 `DESIGN.md` 设计文档包。
 
-`clone-design` 适合这条工作流：
+`clone-design` 现在内置完整链路，适合这条工作流：
 
 ```text
-URL -> UI clone -> self-contained HTML -> clone-design -> design-md/<slug>/
+URL -> clone-design 内建克隆流程 -> captures/<slug>/clone.html -> design-md/<slug>/
 ```
 
-它的重点不是像素级重建，而是把页面里可复用的视觉规则提炼出来，方便后续交给 AI、设计师或前端继续复现和扩展。
+它的重点不是像素级重建，而是先复用 `frontend-ui-clone` 的克隆方法拿到高质量 `clone.html`，再把页面里可复用的视觉规则提炼出来，方便后续交给 AI、设计师或前端继续复现和扩展。
 
 案例输出目录遵循接近 `awesome-design-md` 的结构：
 
@@ -20,6 +20,9 @@ design-md/<slug>/
 
 ## 产出内容
 
+- `captures/<slug>/clone.html`：自包含网页快照
+- `captures/<slug>/homepage.png`：抓取时的页面截图
+- `captures/<slug>/live.json`：可选的页面实时样式证据
 - `DESIGN.md`：整理后的设计系统说明
 - `README.md`：案例目录说明
 - `preview.html`：亮色设计 Token 预览
@@ -33,6 +36,8 @@ clone-design/
   SKILL.md
   README.md
   README.en.md
+  references/
+    ui_clone_workflow.md
   scripts/
     generate_design_md.py
   design-md/
@@ -51,9 +56,15 @@ clone-design/
 
 ## 快速开始
 
-1. 先准备一个自包含页面快照。
-   最理想的输入是通过 `frontend-ui-clone` 或 Playwright 之类方式拿到的 `clone.html`。
-2. 运行生成脚本：
+1. 直接把网址交给 skill。
+
+```text
+/clone-design https://example.com
+```
+
+这一步会在 skill 内部直接复用 `frontend-ui-clone` 的克隆流程，不需要用户再安装另一个 skill。
+
+2. 如果你已经有现成的 `clone.html`，也可以只运行生成脚本：
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -88,6 +99,7 @@ python3 scripts/generate_design_md.py \
 
 ## 说明
 
+- 现在不需要单独安装 `frontend-ui-clone`；`clone-design` 会在 skill 内部直接复用那套克隆流程。
 - 输入的 `clone.html` 质量越高，输出结果越可靠。
 - 提取器主要读取 HTML 与 CSS 信号，无法完整恢复仅存在于运行时的动态状态。
 - 情绪判断、Token 角色命名和组件分类，仍建议做一次人工复核。

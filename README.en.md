@@ -4,13 +4,13 @@
 
 Turn any website into a reusable `DESIGN.md` bundle.
 
-`clone-design` is built for this workflow:
+`clone-design` now includes the full flow:
 
 ```text
-URL -> UI clone -> self-contained HTML -> clone-design -> design-md/<slug>/
+URL -> built-in clone flow -> captures/<slug>/clone.html -> design-md/<slug>/
 ```
 
-It focuses on design distillation rather than pixel-perfect reconstruction. The goal is to extract reusable visual rules that another agent, designer, or frontend developer can build on.
+It first reuses the same capture methodology as `frontend-ui-clone` to obtain a strong `clone.html`, then distills reusable visual rules that another agent, designer, or frontend developer can build on.
 
 The case output follows an `awesome-design-md`-style structure:
 
@@ -20,6 +20,9 @@ design-md/<slug>/
 
 ## What It Produces
 
+- `captures/<slug>/clone.html`: self-contained page snapshot
+- `captures/<slug>/homepage.png`: capture-time screenshot
+- `captures/<slug>/live.json`: optional live-style evidence
 - `DESIGN.md`: distilled design-system guidance
 - `README.md`: case-level bundle notes
 - `preview.html`: light token preview
@@ -33,6 +36,8 @@ clone-design/
   SKILL.md
   README.md
   README.en.md
+  references/
+    ui_clone_workflow.md
   scripts/
     generate_design_md.py
   design-md/
@@ -51,9 +56,15 @@ clone-design/
 
 ## Quick Start
 
-1. Prepare a self-contained page snapshot.
-   The best input is a `clone.html` captured through `frontend-ui-clone` or a similar Playwright workflow.
-2. Run the generator:
+1. Hand a URL directly to the skill:
+
+```text
+/clone-design https://example.com
+```
+
+This reuses the `frontend-ui-clone` capture flow inside the skill, so the user does not need to install a second cloning skill.
+
+2. If you already have a `clone.html`, you can still run the generator script directly:
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -88,6 +99,7 @@ This example preserves both sides of the workflow:
 
 ## Notes
 
+- You no longer need to install `frontend-ui-clone` separately; `clone-design` reuses that workflow internally.
 - Better `clone.html` input leads to better output.
 - The extractor reads HTML and CSS signals; it does not fully reconstruct runtime-only interaction states.
 - Mood, token roles, and component taxonomy should still get a final human review.
