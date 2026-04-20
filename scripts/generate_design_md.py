@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import math
+import os
 import re
 import sys
 from collections import Counter, defaultdict
@@ -482,6 +483,22 @@ def extract_site_name(name: str | None, title: str, path: Path, url: str | None)
     return stem or "Extracted Site"
 
 
+def infer_site_name_from_paths(paths: list[Path]) -> str | None:
+    if not paths:
+        return None
+    if len(paths) == 1:
+        parent_name = paths[0].parent.name
+        if parent_name and parent_name not in {"captures", "design-md"}:
+            return parent_name
+        return None
+
+    common_parent = Path(os.path.commonpath([str(path.parent) for path in paths]))
+    candidate = common_parent.name
+    if candidate in {"captures", "design-md"} and common_parent.parent.name:
+        candidate = common_parent.parent.name
+    return candidate or None
+
+
 def normalize_slug(value: str) -> str:
     slug = re.sub(r"[^a-zA-Z0-9]+", "-", value.strip().lower())
     slug = slug.strip("-")
@@ -915,6 +932,106 @@ def render_typography_principles(fonts: dict, typography: dict[str, dict[str, st
     return "\n".join(lines) or "- Typography should be reviewed manually; the clone did not expose strong recurring text rules."
 
 
+def resolve_input_paths(raw_paths: list[str], capture_dir: str | None) -> list[Path]:
+    resolved: list[Path] = []
+    seen: set[Path] = set()
+
+    def add_path(path: Path) -> None:
+        candidate = path.expanduser().resolve()
+        if candidate in seen:
+            return
+        seen.add(candidate)
+        resolved.append(candidate)
+
+    for raw_path in raw_paths:
+        path = Path(raw_path)
+        if path.is_dir():
+            clone_candidates = sorted(path.rglob("clone.html"))
+            if clone_candidates:
+                for candidate in clone_candidates:
+                    add_path(candidate)
+                continue
+            for candidate in sorted(path.rglob("*.html")):
+                add_path(candidate)
+            continue
+        add_path(path)
+
+    if capture_dir:
+        capture_root = Path(capture_dir).expanduser().resolve()
+        clone_candidates = sorted(capture_root.rglob("clone.html"))
+        if clone_candidates:
+            for candidate in clone_candidates:
+                add_path(candidate)
+        else:
+            for candidate in sorted(capture_root.rglob("*.html")):
+                add_path(candidate)
+
+    return resolved
+
+
+def build_source_context(input_paths: list[Path], url: str | None, capture_dir: str | None) -> dict:
+    capture_root = Path(capture_dir).expanduser().resolve() if capture_dir else None
+    if capture_root is None and len(input_paths) > 1:
+        capture_root = Path(os.path.commonpath([str(path.parent) for path in input_paths]))
+
+    labels: list[str] = []
+    for path in input_paths:
+        label = str(path)
+        if capture_root is not None:
+            try:
+                label = path.relative_to(capture_root).as_posix()
+            except ValueError:
+                label = path.name
+        elif len(input_paths) == 1:
+            label = path.name
+        labels.append(label)
+
+    return {
+        "url": url,
+        "count": len(input_paths),
+        "input_paths": [str(path) for path in input_paths],
+        "labels": labels,
+        "capture_dir": str(capture_root) if capture_root else None,
+        "mode": "multi" if len(input_paths) > 1 else "single",
+    }
+
+
+def render_source_scope(source_context: dict) -> str:
+    if not source_context["input_paths"]:
+        return ""
+    lines = [
+        f"### Capture Scope",
+        f"- Snapshot count: `{source_context['count']}`",
+    ]
+    if source_context.get("url"):
+        lines.append(f"- Live source: `{source_context['url']}`")
+    if source_context.get("capture_dir"):
+        lines.append(f"- Capture root: `{source_context['capture_dir']}`")
+    lines.append("- Included snapshots:")
+    for label in source_context["labels"][:8]:
+        lines.append(f"- `{label}`")
+    remaining = source_context["count"] - min(source_context["count"], 8)
+    if remaining > 0:
+        lines.append(f"- ... plus `{remaining}` more snapshot(s)")
+    return "\n".join(lines)
+
+
+def source_summary_text(source_context: dict) -> str:
+    if source_context["count"] <= 1:
+        return source_context.get("url") or source_context["input_paths"][0]
+    if source_context.get("url"):
+        return f"{source_context['count']} cloned pages captured from {source_context['url']}"
+    return f"{source_context['count']} cloned pages"
+
+
+def source_note_text(source_context: dict, metrics: dict) -> str:
+    if source_context["count"] <= 1:
+        return f"Source URL: {source_context['url']}" if source_context.get("url") else f"Source clone: {metrics['html_path']}"
+    if source_context.get("url"):
+        return f"Source URL: {source_context['url']} ({source_context['count']} captured pages)"
+    return f"Source clones: {source_context['count']} captured pages"
+
+
 def render_component_section(metrics: dict) -> str:
     palette = metrics["palette"]
     components = metrics["component_properties"]
@@ -1054,10 +1171,10 @@ def render_prompt_guide(site_name: str, metrics: dict) -> str:
     )
 
 
-def render_design_md(site_name: str, metrics: dict, url: str | None) -> str:
+def render_design_md(site_name: str, metrics: dict, source_context: dict) -> str:
     palette = metrics["palette"]
     theme_mood = infer_theme_mood(palette, metrics["fonts"], metrics["radii"], metrics["shadows"])
-    source_note = f"Source URL: {url}" if url else f"Source clone: {metrics['html_path']}"
+    source_note = source_note_text(source_context, metrics)
     visual_lines = [
         f"{site_name}'s visual language reads as a {theme_mood} system. The interface is anchored on {describe_color(palette['background']) if palette.get('background') else 'an inferred dominant background'} with {describe_color(palette['text']) if palette.get('text') else 'an inferred dominant text color'} carrying most of the legibility load.",
         f"Typography appears to be led by `{metrics['fonts']['primary']}`." if metrics["fonts"].get("primary") else "Typography should be reviewed manually; no strong primary stack was isolated from the clone.",
@@ -1077,6 +1194,8 @@ def render_design_md(site_name: str, metrics: dict, url: str | None) -> str:
         f"# Design System: {site_name}",
         "",
         f"> Extracted from a cloned HTML snapshot. {source_note}. Some component roles and mood descriptions are inferred from recurring CSS patterns.",
+        "",
+        render_source_scope(source_context),
         "",
         "## 1. Visual Theme & Atmosphere",
         "",
@@ -1258,12 +1377,23 @@ def build_preview_theme(metrics: dict, mode: str) -> dict[str, str]:
     }
 
 
-def render_readme(site_name: str, url: str | None) -> str:
-    source_label = url or "the source website"
+def render_readme(site_name: str, source_context: dict) -> str:
+    source_label = source_summary_text(source_context)
     source_host = site_name.lower()
-    if url:
-        source_host = re.sub(r"^https?://", "", url).split("/", 1)[0]
-    link_target = url or "./DESIGN.md"
+    if source_context.get("url"):
+        source_host = re.sub(r"^https?://", "", source_context["url"]).split("/", 1)[0]
+    link_target = source_context.get("url") or "./DESIGN.md"
+    scope_lines = [
+        "## Capture Scope",
+        "",
+        f"- Snapshot count: `{source_context['count']}`",
+    ]
+    if source_context.get("capture_dir"):
+        scope_lines.append(f"- Capture root: `{source_context['capture_dir']}`")
+    for label in source_context["labels"][:8]:
+        scope_lines.append(f"- `{label}`")
+    if source_context["count"] > 8:
+        scope_lines.append(f"- ... plus `{source_context['count'] - 8}` more snapshot(s)")
     return "\n".join(
         [
             f"# {site_name} Inspired Design System",
@@ -1280,6 +1410,8 @@ def render_readme(site_name: str, url: str | None) -> str:
             "",
             f"Use [DESIGN.md](./DESIGN.md) as a reference for AI agents to generate UI that follows the {site_name} visual language.",
             "",
+            *scope_lines,
+            "",
             "## Preview",
             "",
             "Open these files locally:",
@@ -1292,7 +1424,7 @@ def render_readme(site_name: str, url: str | None) -> str:
     )
 
 
-def render_preview_html(site_name: str, metrics: dict, mode: str, url: str | None) -> str:
+def render_preview_html(site_name: str, metrics: dict, mode: str, source_context: dict) -> str:
     theme = build_preview_theme(metrics, mode)
     palette = metrics["palette"]
 
@@ -1388,7 +1520,7 @@ def render_preview_html(site_name: str, metrics: dict, mode: str, url: str | Non
     )
     nav_label = escape(site_name.lower().replace(" ", "-"))
     mode_label = "Dark" if mode == "dark" else "Light"
-    source_meta = escape(url or metrics["html_path"])
+    source_meta = escape(source_summary_text(source_context))
     secondary_button_border = palette.get("border") or theme["divider"]
 
     return f"""<!DOCTYPE html>
@@ -1795,7 +1927,7 @@ def render_preview_html(site_name: str, metrics: dict, mode: str, url: str | Non
   </section>
 
   <footer class="footer">
-    Preview generated from a cloned HTML snapshot of {escape(site_name)}. Open <a href="./DESIGN.md">DESIGN.md</a> for the full written system.
+    Preview generated from {escape(source_summary_text(source_context))}. Open <a href="./DESIGN.md">DESIGN.md</a> for the full written system.
   </footer>
 </body>
 </html>
@@ -1806,11 +1938,15 @@ def serialize_counter(counter: Counter[str], limit: int = 20, numeric: bool = Fa
     return [{"value": value, "count": count} for value, count in sort_counter_items(counter, limit=limit, numeric=numeric)]
 
 
-def build_evidence_payload(site_name: str, url: str | None, metrics: dict) -> dict:
+def build_evidence_payload(site_name: str, source_context: dict, metrics: dict) -> dict:
     return {
         "site_name": site_name,
-        "source_url": url,
+        "source_url": source_context.get("url"),
         "source_html": metrics["html_path"],
+        "source_html_files": source_context["input_paths"],
+        "source_labels": source_context["labels"],
+        "source_count": source_context["count"],
+        "capture_dir": source_context.get("capture_dir"),
         "html_title": metrics["html_title"],
         "palette": metrics["palette"],
         "fonts": metrics["fonts"],
@@ -1835,7 +1971,8 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description="Generate DESIGN.md from a cloned self-contained HTML file."
     )
-    parser.add_argument("input_html", help="Path to the cloned HTML file")
+    parser.add_argument("input_html", nargs="*", help="Path(s) to cloned HTML files, or a directory containing clone.html files")
+    parser.add_argument("--capture-dir", help="Capture directory to scan recursively for clone.html files")
     parser.add_argument("--name", help="Override site name")
     parser.add_argument("--url", help="Original source URL")
     parser.add_argument("--out", help="Write DESIGN.md to this path")
@@ -1846,20 +1983,29 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
-    html_path = Path(args.input_html).expanduser().resolve()
-    if not html_path.exists():
-        print(f"Input HTML not found: {html_path}", file=sys.stderr)
+    if not args.input_html and not args.capture_dir:
+        print("Provide at least one HTML input path or --capture-dir.", file=sys.stderr)
+        return 1
+    input_paths = resolve_input_paths(args.input_html, args.capture_dir)
+    if not input_paths:
+        print("No input HTML files were found.", file=sys.stderr)
+        return 1
+    missing = [path for path in input_paths if not path.exists()]
+    if missing:
+        print(f"Input HTML not found: {missing[0]}", file=sys.stderr)
         return 1
 
-    html_text = html_path.read_text(encoding="utf-8", errors="ignore")
-    metrics = collect_metrics(html_text, html_path)
-    site_name = extract_site_name(args.name, metrics["html_title"], html_path, args.url)
+    html_text = "\n".join(path.read_text(encoding="utf-8", errors="ignore") for path in input_paths)
+    metrics = collect_metrics(html_text, input_paths[0])
+    inferred_name = infer_site_name_from_paths(input_paths)
+    site_name = extract_site_name(args.name or inferred_name, metrics["html_title"], input_paths[0], args.url)
     site_slug = normalize_slug(site_name)
-    design_md = render_design_md(site_name, metrics, args.url)
-    readme_md = render_readme(site_name, args.url)
-    preview_light = render_preview_html(site_name, metrics, "light", args.url)
-    preview_dark = render_preview_html(site_name, metrics, "dark", args.url)
-    evidence = build_evidence_payload(site_name, args.url, metrics)
+    source_context = build_source_context(input_paths, args.url, args.capture_dir)
+    design_md = render_design_md(site_name, metrics, source_context)
+    readme_md = render_readme(site_name, source_context)
+    preview_light = render_preview_html(site_name, metrics, "light", source_context)
+    preview_dark = render_preview_html(site_name, metrics, "dark", source_context)
+    evidence = build_evidence_payload(site_name, source_context, metrics)
 
     if args.out:
         design_path = Path(args.out).expanduser().resolve()

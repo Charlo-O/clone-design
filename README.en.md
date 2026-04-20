@@ -7,10 +7,16 @@ Turn any website into a reusable `DESIGN.md` bundle.
 `clone-design` now includes the full flow:
 
 ```text
-URL -> built-in clone flow -> captures/<slug>/clone.html -> design-md/<slug>/
+URL -> built-in clone flow -> captures/<slug>/<page>/clone.html -> design-md/<slug>/
 ```
 
 It first reuses the same capture methodology as `frontend-ui-clone` to obtain a strong `clone.html`, then distills reusable visual rules that another agent, designer, or frontend developer can build on.
+
+It now supports more than a single public page:
+
+- keep the same browser session after login
+- let the user choose several key pages or UI states
+- synthesize multiple `clone.html` files into one site-level `DESIGN.md`
 
 The case output follows an `awesome-design-md`-style structure:
 
@@ -20,9 +26,11 @@ design-md/<slug>/
 
 ## What It Produces
 
-- `captures/<slug>/clone.html`: self-contained page snapshot
-- `captures/<slug>/homepage.png`: capture-time screenshot
-- `captures/<slug>/live.json`: optional live-style evidence
+- `captures/<slug>/clone.html`: self-contained snapshot in single-page mode
+- `captures/<slug>/<page>/clone.html`: per-page or per-state snapshots in multi-page mode
+- `captures/<slug>/<page>/homepage.png`: capture-time screenshot
+- `captures/<slug>/<page>/live.json`: optional live-style evidence
+- `captures/<slug>/capture-plan.json`: optional capture manifest
 - `DESIGN.md`: distilled design-system guidance
 - `README.md`: case-level bundle notes
 - `preview.html`: light token preview
@@ -38,6 +46,7 @@ clone-design/
   README.en.md
   references/
     ui_clone_workflow.md
+    multi_page_session_workflow.md
   scripts/
     generate_design_md.py
   design-md/
@@ -64,7 +73,9 @@ clone-design/
 
 This reuses the `frontend-ui-clone` capture flow inside the skill, so the user does not need to install a second cloning skill.
 
-2. If you already have a `clone.html`, you can still run the generator script directly:
+2. If the site requires login, or you want broader coverage, keep the same browser session alive and capture several chosen pages or states into `captures/<slug>/<page>/`.
+
+3. If you already have a `clone.html`, you can still run the generator script directly:
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -75,7 +86,29 @@ python3 scripts/generate_design_md.py \
   --json-out design-md/jimeng/evidence.json
 ```
 
-3. Review the generated `DESIGN.md` and mark uncertain statements as inferred rather than observed.
+4. For multi-page synthesis, pass multiple HTML files or scan a capture directory:
+
+```bash
+python3 scripts/generate_design_md.py \
+  captures/acme/home/clone.html \
+  captures/acme/workspace/clone.html \
+  captures/acme/settings-modal-open/clone.html \
+  --name "Acme" \
+  --url "https://app.example.com" \
+  --out-dir design-md/acme \
+  --json-out design-md/acme/evidence.json
+```
+
+```bash
+python3 scripts/generate_design_md.py \
+  --capture-dir captures/acme \
+  --name "Acme" \
+  --url "https://app.example.com" \
+  --out-dir design-md/acme \
+  --json-out design-md/acme/evidence.json
+```
+
+5. Review the generated `DESIGN.md` and mark uncertain statements as inferred rather than observed.
 
 ## Use As A Skill
 
@@ -100,6 +133,7 @@ This example preserves both sides of the workflow:
 ## Notes
 
 - You no longer need to install `frontend-ui-clone` separately; `clone-design` reuses that workflow internally.
+- For authenticated products, a curated logged-in session with several chosen pages is usually better than crawling the whole app.
 - Better `clone.html` input leads to better output.
-- The extractor reads HTML and CSS signals; it does not fully reconstruct runtime-only interaction states.
+- The extractor reads HTML and CSS signals; it can synthesize several captured pages, but it does not fully reconstruct uncaptured runtime-only interaction states.
 - Mood, token roles, and component taxonomy should still get a final human review.
