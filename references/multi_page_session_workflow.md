@@ -4,12 +4,12 @@ Use this workflow when the target site:
 
 - requires login
 - has important pages behind auth
-- needs several routes or states to represent the design system
+- needs several routes or states to represent the design system or landing-page experience
 - contains drawers, modals, tabs, or workspaces that should be captured separately
 
 ## Goal
 
-Keep one authenticated browser session alive, then capture a curated set of pages or UI states under the same session instead of treating the product as a single public landing page.
+Keep one authenticated browser session alive, then capture a curated set of pages or UI states under the same session instead of treating the product as a single public page.
 
 ## Recommended Process
 
@@ -19,13 +19,15 @@ Keep one authenticated browser session alive, then capture a curated set of page
 4. Ask the user which pages or states matter, or infer a short high-value list if they already named them.
 5. Capture each page or state separately.
 6. Save every capture under a page-specific folder.
-7. Run the generator on all captured `clone.html` files together.
+7. For design extraction, run the generator on all captured `clone.html` files together.
+8. For landing remix, choose the page/state that will become the main `source-clone.html`, and keep the other captures as evidence or secondary route references.
 
 ## What To Capture
 
 Prefer a small, representative set such as:
 
 - marketing or dashboard home
+- landing page plus pricing or docs page if those pages affect the offer copy
 - primary creation or editing workspace
 - settings or configuration page
 - list/detail pair
@@ -71,9 +73,9 @@ The optional `capture-plan.json` can list page labels, original URLs, and any no
 - If a modal, drawer, or popover matters, capture it as its own state-specific folder.
 - If a page is data-heavy, capture the design shell and representative UI, not every possible record variation.
 
-## Generation
+## Generation Or Remix
 
-After the captures exist, synthesize them together:
+For design extraction, synthesize captures together:
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -85,6 +87,8 @@ python3 scripts/generate_design_md.py \
 ```
 
 You can also pass specific `clone.html` files if only a subset should contribute to the final bundle.
+
+For landing remix, do not merge unrelated pages into one HTML file. Pick one primary landing-page capture for `landing-pages/<site-slug>/source-clone.html`, then use secondary captures only for copy, imagery, components, or states that the user explicitly wants reused.
 
 ## Reporting
 

@@ -2,40 +2,77 @@
 
 # clone-design
 
-Turn any website into a reusable `DESIGN.md` bundle.
+`clone-design` is an end-to-end website cloning, landing-page remix, and design-system extraction skill.
 
-`clone-design` now includes the full flow:
+It now supports two primary workflows:
 
 ```text
-URL -> built-in clone flow -> captures/<slug>/<page>/clone.html -> design-md/<slug>/
+URL -> 1:1 clone.html -> project copy replacement -> imagegen asset replacement -> landing-pages/<slug>/index.html
 ```
 
-It first reuses the same capture methodology as `frontend-ui-clone` to obtain a strong `clone.html`, then distills reusable visual rules that another agent, designer, or frontend developer can build on.
+```text
+URL / clone.html -> design signal extraction -> design-md/<slug>/DESIGN.md
+```
 
-It now supports more than a single public page:
+Core principle: **clone 1:1 first, then adapt content**. Do not rewrite copy, replace images, or redesign before the baseline clone has passed browser screenshot review.
 
-- keep the same browser session after login
-- let the user choose several key pages or UI states
-- synthesize multiple `clone.html` files into one site-level `DESIGN.md`
+## Main Capabilities
 
-The case output follows an `awesome-design-md`-style structure:
+- Capture rendered DOM, CSS, fonts, images, and visual state from a URL in a real browser.
+- Generate a high-fidelity `clone.html` as the baseline for remixing or design extraction.
+- Follow the `frontend-ui-clone` approach for lazy images, CSS variables, gradient text, inner scroll containers, invisible overlays, and Tailwind cascade issues.
+- Replace source landing-page copy with product copy discovered from the current project folder.
+- Use the `imagegen` skill to create project-relevant hero images, product visuals, thumbnails, avatars, or decorative raster assets.
+- Preserve the original layout, spacing, type rhythm, animation feel, and responsive structure.
+- Continue producing `DESIGN.md`, light/dark token previews, and optional `evidence.json`.
+
+## Outputs
+
+### Landing Remix
+
+```text
+landing-pages/<slug>/
+  index.html
+  source-clone.html
+  content-inventory.json
+  copy-map.json
+  image-plan.json
+  assets/
+    generated/
+  qa/
+    original-desktop.png
+    clone-desktop.png
+    final-desktop.png
+```
+
+### Capture Artifacts
+
+```text
+captures/<slug>/
+  clone.html
+  homepage.png
+  live.json
+```
+
+For multi-page or multi-state sessions:
+
+```text
+captures/<slug>/<page>/
+  clone.html
+  homepage.png
+  live.json
+```
+
+### DESIGN.md Bundle
 
 ```text
 design-md/<slug>/
+  DESIGN.md
+  README.md
+  preview.html
+  preview-dark.html
+  evidence.json
 ```
-
-## What It Produces
-
-- `captures/<slug>/clone.html`: self-contained snapshot in single-page mode
-- `captures/<slug>/<page>/clone.html`: per-page or per-state snapshots in multi-page mode
-- `captures/<slug>/<page>/homepage.png`: capture-time screenshot
-- `captures/<slug>/<page>/live.json`: optional live-style evidence
-- `captures/<slug>/capture-plan.json`: optional capture manifest
-- `DESIGN.md`: distilled design-system guidance
-- `README.md`: case-level bundle notes
-- `preview.html`: light token preview
-- `preview-dark.html`: dark token preview
-- `evidence.json`: optional extracted evidence
 
 ## Repo Layout
 
@@ -46,36 +83,36 @@ clone-design/
   README.en.md
   references/
     ui_clone_workflow.md
+    landing_page_remix_workflow.md
     multi_page_session_workflow.md
   scripts/
+    extract_landing_inventory.py
     generate_design_md.py
-  design-md/
-    jimeng/
-      DESIGN.md
-      README.md
-      preview.html
-      preview-dark.html
-      evidence.json
   captures/
-    jimeng/
-      clone.html
-      live.json
-      homepage.png
+  design-md/
+  landing-pages/
 ```
 
 ## Quick Start
 
-1. Hand a URL directly to the skill:
+### Clone And Remix A Landing Page
 
 ```text
-/clone-design https://example.com
+/clone-design turn https://example.com into a 1:1 cloned landing page for this project
 ```
 
-This reuses the `frontend-ui-clone` capture flow inside the skill, so the user does not need to install a second cloning skill.
+Recommended flow:
 
-2. If the site requires login, or you want broader coverage, keep the same browser session alive and capture several chosen pages or states into `captures/<slug>/<page>/`.
+1. Capture the source page in a real browser and save `captures/<slug>/clone.html`.
+2. Compare source and local clone screenshots, then fix visible differences.
+3. Read the current project folder for product name, positioning, features, CTAs, voice, and existing assets.
+4. Run `scripts/extract_landing_inventory.py` to create `content-inventory.json`.
+5. Create `copy-map.json`, then replace visible copy.
+6. Create `image-plan.json`, then reuse project assets or call `imagegen` for raster replacements.
+7. Write `landing-pages/<slug>/index.html`.
+8. Run desktop and mobile browser QA.
 
-3. If you already have a `clone.html`, you can still run the generator script directly:
+### Generate DESIGN.md Only
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -86,18 +123,7 @@ python3 scripts/generate_design_md.py \
   --json-out design-md/jimeng/evidence.json
 ```
 
-4. For multi-page synthesis, pass multiple HTML files or scan a capture directory:
-
-```bash
-python3 scripts/generate_design_md.py \
-  captures/acme/home/clone.html \
-  captures/acme/workspace/clone.html \
-  captures/acme/settings-modal-open/clone.html \
-  --name "Acme" \
-  --url "https://app.example.com" \
-  --out-dir design-md/acme \
-  --json-out design-md/acme/evidence.json
-```
+For multi-page synthesis:
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -108,32 +134,20 @@ python3 scripts/generate_design_md.py \
   --json-out design-md/acme/evidence.json
 ```
 
-5. Review the generated `DESIGN.md` and mark uncertain statements as inferred rather than observed.
-
 ## Use As A Skill
 
-You can place this repository in a local skill directory, or copy the core files you need:
+Place this repository in a local skill directory, or copy the core resources:
 
 - `SKILL.md`
+- `references/`
+- `scripts/extract_landing_inventory.py`
 - `scripts/generate_design_md.py`
-- the example content under `design-md/` and `captures/`
-
-## Included Example
-
-The repository currently includes one complete example:
-
-- [jimeng design bundle](./design-md/jimeng/)
-- [jimeng capture artifacts](./captures/jimeng/)
-
-This example preserves both sides of the workflow:
-
-- `captures/jimeng/`: browser-derived source material
-- `design-md/jimeng/`: final distilled design bundle
+- example `captures/` and `design-md/`
 
 ## Notes
 
-- You no longer need to install `frontend-ui-clone` separately; `clone-design` reuses that workflow internally.
-- For authenticated products, a curated logged-in session with several chosen pages is usually better than crawling the whole app.
-- Better `clone.html` input leads to better output.
-- The extractor reads HTML and CSS signals; it can synthesize several captured pages, but it does not fully reconstruct uncaptured runtime-only interaction states.
-- Mood, token roles, and component taxonomy should still get a final human review.
+- The clone phase aims for 1:1 fidelity and should not add creative interpretation.
+- The remix phase replaces copy, imagery, and brand-specific content while preserving structure.
+- `imagegen` is for raster image assets; SVG icons, CSS gradients, and simple vector decoration should usually remain code-native.
+- For authenticated products, preserve one browser session and capture a curated set of pages or states instead of crawling the whole app by default.
+- `DESIGN.md` generation still reads HTML/CSS signals; mood, token roles, and component taxonomy should get a final human review.

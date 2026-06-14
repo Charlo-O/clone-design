@@ -2,40 +2,77 @@
 
 # clone-design
 
-将任意网站整理成可复用的 `DESIGN.md` 设计文档包。
+`clone-design` 是一个端到端的网站克隆与 landing page 改写 skill。
 
-`clone-design` 现在内置完整链路，适合这条工作流：
+它现在支持两条主要链路：
 
 ```text
-URL -> clone-design 内建克隆流程 -> captures/<slug>/<page>/clone.html -> design-md/<slug>/
+URL -> 1:1 clone.html -> 项目文案替换 -> imagegen 素材替换 -> landing-pages/<slug>/index.html
 ```
 
-它的重点不是像素级重建，而是先复用 `frontend-ui-clone` 的克隆方法拿到高质量 `clone.html`，再把页面里可复用的视觉规则提炼出来，方便后续交给 AI、设计师或前端继续复现和扩展。
+```text
+URL / clone.html -> 设计信号提取 -> design-md/<slug>/DESIGN.md
+```
 
-现在它不只支持单页，也支持：
+核心原则是：**先 1:1 还原，再改写内容**。在没有通过浏览器截图检查之前，不改文案、不换图片、不重新设计。
 
-- 登录后保留同一个浏览器会话
-- 由你选择多个关键页面或界面状态
-- 将多个 `clone.html` 一起汇总成一个站点级 `DESIGN.md`
+## 主要能力
 
-案例输出目录遵循接近 `awesome-design-md` 的结构：
+- 从 URL 抓取真实浏览器渲染后的 DOM、CSS、字体、图片和视觉状态
+- 生成高保真 `clone.html`，作为后续改写或设计提炼的基线
+- 按 `frontend-ui-clone` 的思路处理懒加载、CSS 变量、渐变文字、内层滚动容器、遮挡浮层和 Tailwind 样式冲突
+- 将外部 landing page 的文案替换为当前项目文件夹中的产品文案
+- 调用 `imagegen` skill 生成项目相关的 hero 图、产品图、缩略图、头像或装饰图
+- 保持原页面布局、间距、字体节奏、动效感和响应式结构
+- 继续支持输出 `DESIGN.md`、亮色/暗色 token 预览和 `evidence.json`
+
+## 输出内容
+
+### Landing remix 输出
+
+```text
+landing-pages/<slug>/
+  index.html
+  source-clone.html
+  content-inventory.json
+  copy-map.json
+  image-plan.json
+  assets/
+    generated/
+  qa/
+    original-desktop.png
+    clone-desktop.png
+    final-desktop.png
+```
+
+### 捕获材料
+
+```text
+captures/<slug>/
+  clone.html
+  homepage.png
+  live.json
+```
+
+多页面或多状态时：
+
+```text
+captures/<slug>/<page>/
+  clone.html
+  homepage.png
+  live.json
+```
+
+### DESIGN.md 输出
 
 ```text
 design-md/<slug>/
+  DESIGN.md
+  README.md
+  preview.html
+  preview-dark.html
+  evidence.json
 ```
-
-## 产出内容
-
-- `captures/<slug>/clone.html`：单页模式下的自包含网页快照
-- `captures/<slug>/<page>/clone.html`：多页面模式下，每个页面或状态各自的快照
-- `captures/<slug>/<page>/homepage.png`：抓取时的页面截图
-- `captures/<slug>/<page>/live.json`：可选的页面实时样式证据
-- `captures/<slug>/capture-plan.json`：可选的页面采集计划
-- `DESIGN.md`：整理后的设计系统说明
-- `README.md`：案例目录说明
-- `preview.html`：亮色设计 Token 预览
-- `preview-dark.html`：暗色设计 Token 预览
-- `evidence.json`：可选的原始提取证据
 
 ## 仓库结构
 
@@ -46,41 +83,36 @@ clone-design/
   README.en.md
   references/
     ui_clone_workflow.md
+    landing_page_remix_workflow.md
     multi_page_session_workflow.md
   scripts/
+    extract_landing_inventory.py
     generate_design_md.py
-  design-md/
-    jimeng/
-      DESIGN.md
-      README.md
-      preview.html
-      preview-dark.html
-      evidence.json
   captures/
-    jimeng/
-      clone.html
-      live.json
-      homepage.png
+  design-md/
+  landing-pages/
 ```
 
 ## 快速开始
 
-1. 直接把网址交给 skill。
+### 复刻并改写 landing page
 
 ```text
-/clone-design https://example.com
+/clone-design 把 https://example.com 这个 landing page 1:1 复刻成本项目的官网
 ```
 
-这一步会在 skill 内部直接复用 `frontend-ui-clone` 的克隆流程，不需要用户再安装另一个 skill。
+推荐流程：
 
-2. 如果目标站点需要登录，或者你想抓多个页面，可以走同一个浏览器会话：
+1. 用真实浏览器捕获源网页，生成 `captures/<slug>/clone.html`。
+2. 截图对比源网页和本地 clone，修复明显差异。
+3. 从当前项目文件夹中读取产品名称、定位、功能、CTA、语气和现有素材。
+4. 运行 `scripts/extract_landing_inventory.py` 生成 `content-inventory.json`。
+5. 生成 `copy-map.json`，再替换可见文案。
+6. 生成 `image-plan.json`，用现有项目素材或 `imagegen` 替换 raster 图片。
+7. 输出 `landing-pages/<slug>/index.html`。
+8. 做桌面和移动端浏览器 QA。
 
-- 先登录
-- 再选择你要的几个页面或状态
-- 每个页面会保存到 `captures/<slug>/<page>/`
-- 最后统一汇总成一个 `design-md/<slug>/`
-
-3. 如果你已经有现成的 `clone.html`，也可以只运行生成脚本：
+### 只生成 DESIGN.md
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -91,18 +123,7 @@ python3 scripts/generate_design_md.py \
   --json-out design-md/jimeng/evidence.json
 ```
 
-4. 多页面汇总时，可以直接传多个 HTML，或者整个 capture 目录：
-
-```bash
-python3 scripts/generate_design_md.py \
-  captures/acme/home/clone.html \
-  captures/acme/workspace/clone.html \
-  captures/acme/settings-modal-open/clone.html \
-  --name "Acme" \
-  --url "https://app.example.com" \
-  --out-dir design-md/acme \
-  --json-out design-md/acme/evidence.json
-```
+多页面汇总：
 
 ```bash
 python3 scripts/generate_design_md.py \
@@ -113,32 +134,20 @@ python3 scripts/generate_design_md.py \
   --json-out design-md/acme/evidence.json
 ```
 
-5. 打开生成后的 `DESIGN.md`，把不够确定的描述明确标注为 inferred，而不是 observed。
-
 ## 作为 Skill 使用
 
-你可以直接把这个仓库放进本地技能目录，或者按需复制下面这些核心文件：
+把这个仓库放进本地技能目录，或复制这些核心内容：
 
 - `SKILL.md`
+- `references/`
+- `scripts/extract_landing_inventory.py`
 - `scripts/generate_design_md.py`
-- `design-md/` 和 `captures/` 下的示例内容
-
-## 已包含案例
-
-当前仓库已内置一套完整案例：
-
-- [jimeng 设计产物](./design-md/jimeng/)
-- [jimeng 抓取材料](./captures/jimeng/)
-
-这套案例同时保留了两部分内容：
-
-- `captures/jimeng/`：浏览器抓取得到的源材料
-- `design-md/jimeng/`：最终整理出的设计文档包
+- 示例 `captures/` 和 `design-md/`
 
 ## 说明
 
-- 现在不需要单独安装 `frontend-ui-clone`；`clone-design` 会在 skill 内部直接复用那套克隆流程。
-- 对登录态产品，推荐保留同一个浏览器 session 后抓多个关键页面，而不是强行全站爬取。
-- 输入的 `clone.html` 质量越高，输出结果越可靠。
-- 提取器主要读取 HTML 与 CSS 信号，能汇总多个页面，但无法完整恢复未被捕获的运行时动态状态。
-- 情绪判断、Token 角色命名和组件分类，仍建议做一次人工复核。
+- 复刻阶段默认追求 1:1，不做创意发挥。
+- 改写阶段只替换文案、图片和品牌内容，尽量不动布局结构。
+- `imagegen` 只用于 raster 图片素材；SVG 图标、CSS 渐变、简单矢量装饰默认保留或用代码方式处理。
+- 对登录态产品，推荐保留同一个浏览器 session 后抓取少量关键页面或状态，而不是强行全站爬取。
+- `DESIGN.md` 生成仍基于 HTML/CSS 信号；情绪判断、token 命名和组件分类建议人工复核。

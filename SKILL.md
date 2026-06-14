@@ -1,18 +1,23 @@
 ---
 name: clone-design
-description: End-to-end website-to-DESIGN.md skill. Given a URL or one or more self-contained HTML clones, it captures pages with the frontend-ui-clone workflow, including logged-in multi-page sessions when needed, then distills them into a DESIGN.md bundle with previews and optional evidence JSON. Use when asked to extract a design system, analyze a site's visual language, or turn live pages into DESIGN.md.
+description: End-to-end website cloning, landing-page remix, and DESIGN.md extraction skill. Use when Codex is asked to clone or replicate a website/landing page 1:1 from a URL, turn a source website into a local landing page for the current project by preserving layout while replacing copy and image assets, extract a site's design system into DESIGN.md, analyze visual language, or synthesize multiple captured pages/states into reusable design guidance.
 ---
 
 # clone-design
 
-Turn a website into a reusable `DESIGN.md` bundle.
+Clone a website first, then either remix it into a project-specific landing page or distill it into `DESIGN.md`.
 
-Your job is design distillation, not pixel-perfect cloning. Capture the visual system, keep only reusable rules, and clearly separate observed facts from inference.
+Default posture: preserve the source site's rendered layout with no creative drift until the 1:1 clone has been verified. Only after that may you replace copy, imagery, and brand-specific content for the current project.
 
 ## When To Use
 
 Use this skill when the user asks to:
 
+- clone a website or landing page from a URL
+- replicate a landing page 1:1 before adapting it
+- turn another website's landing page into a landing page for the current local project
+- replace cloned website copy with copy from the current project folder
+- replace cloned imagery with project-relevant generated raster assets
 - turn a website into `DESIGN.md`
 - extract a site's design system
 - analyze the visual language of a page
@@ -21,81 +26,133 @@ Use this skill when the user asks to:
 - transform a UI clone into reusable design guidance
 - turn a live URL directly into a design bundle
 
-## Preferred Workflow
+## Choose The Mode
 
-Best source quality is:
+### Mode A: Landing Page Remix
 
-`URL -> integrated UI clone -> captures/<slug>/<page>/clone.html -> clone-design -> design-md/<slug>/`
+Use this when the user wants to clone another landing page and adapt it to the current project.
+
+Pipeline:
+
+```text
+URL -> 1:1 clone -> verified local page -> project copy map -> imagegen assets -> final landing page
+```
+
+Read and follow:
+
+- [references/ui_clone_workflow.md](./references/ui_clone_workflow.md)
+- [references/landing_page_remix_workflow.md](./references/landing_page_remix_workflow.md)
+
+### Mode B: Design System Extraction
+
+Use this when the user wants `DESIGN.md`, visual-language analysis, or design guidance.
+
+Pipeline:
+
+```text
+URL or clone.html -> capture(s) -> design-md/<slug>/
+```
+
+Read and follow:
+
+- [references/ui_clone_workflow.md](./references/ui_clone_workflow.md)
+- [references/multi_page_session_workflow.md](./references/multi_page_session_workflow.md) when login, multiple pages, or multiple states matter
+
+## Source Capture Rules
 
 If the user gives a URL:
 
-- do NOT ask the user to install or run `frontend-ui-clone` separately
-- first create a self-contained HTML snapshot yourself
+- do not ask the user to install or run `frontend-ui-clone` separately
+- create a self-contained HTML snapshot first
 - reuse the same cloning workflow and fidelity ladder as `frontend-ui-clone`
-- read [references/ui_clone_workflow.md](./references/ui_clone_workflow.md) and follow it
-- if the target requires login or the user wants more than one page, also read [references/multi_page_session_workflow.md](./references/multi_page_session_workflow.md)
-- save the source material under `captures/<slug>/`
+- save source material under `captures/<slug>/`
 - include `clone.html` for every captured page or state
-- add a screenshot and token dump when helpful
+- add screenshots and a token dump when helpful
+- verify the clone in a browser before remixing or distilling
 
 If the user gives a local `.html` file:
 
 - use it directly
 - accept one file, multiple files, or a capture directory that contains several `clone.html` files
 
-Avoid writing `DESIGN.md` from a raw HTTP fetch when the site depends on client-side rendering.
-
-This skill owns both phases:
-
-1. Clone the page into a reusable capture.
-2. Distill the capture into a design bundle.
+Avoid remixing or writing `DESIGN.md` from a raw HTTP fetch when the site depends on client-side rendering.
 
 ## Default Paths
 
 If the user does not specify paths:
 
+Capture files:
+
 - single-page capture folder: `captures/<slug>/`
 - multi-page capture folder: `captures/<slug>/<page-slug>/`
-- capture files per page:
-  - `clone.html`
-  - `homepage.png`
-  - `live.json`
-- optional site-level capture manifest:
-  - `captures/<slug>/capture-plan.json`
+- per-page files: `clone.html`, `homepage.png`, `live.json`
+- optional site-level capture manifest: `captures/<slug>/capture-plan.json`
+
+Landing remix output:
+
+- output folder: `landing-pages/<slug>/`
+- final page: `index.html`
+- verified source clone: `source-clone.html`
+- extracted inventory: `content-inventory.json`
+- generated assets: `assets/generated/`
+- planning and QA files:
+  - `copy-map.json`
+  - `image-plan.json`
+  - `qa/original-desktop.png`
+  - `qa/clone-desktop.png`
+  - `qa/final-desktop.png`
+  - optional mobile screenshots
+
+Design extraction output:
+
 - output folder: `design-md/<slug>/`
 - output files:
   - `DESIGN.md`
   - `README.md`
   - `preview.html`
   - `preview-dark.html`
-- optional evidence file:
-  - `evidence.json`
+- optional evidence file: `evidence.json`
 
-## Clone Then Generate
+## 1:1 Clone Standard
 
 When the input is a URL:
 
 - prefer built-in browser/Playwright tools when available
 - use the same default viewport and scrolling strategy as `frontend-ui-clone`
 - preserve rendered DOM, CSS, fonts, and resolved asset URLs
-- if the site needs authentication, let the user complete login in the browser and keep the same browser context alive
+- preserve original DOM structure, class names, section order, spacing, radii, shadows, typography, gradients, and responsive behavior
+- do not redesign, simplify, rebrand, or re-layout before the verified clone exists
+- if the page needs authentication, let the user complete login in the browser and keep the same browser context alive
 - after login, capture each requested page or UI state separately in the same session
-- save each self-contained page as `captures/<slug>/<page-slug>/clone.html` when doing multi-page work
-- save a visible-state screenshot as `captures/<slug>/<page-slug>/homepage.png`
-- save any useful live token dump as `captures/<slug>/<page-slug>/live.json`
-- if it is truly a single-page job, `captures/<slug>/clone.html` is still valid
 - if the first capture has a blank hero or obvious overlay issue, apply the same escalation mindset as `frontend-ui-clone`:
   - Level 1: DOM + CSS clone
   - Level 1a: hybrid clone with targeted fixes
   - Level 1b: targeted style bake
+- do desktop screenshot QA at approximately `1440 x 900`
+- do mobile screenshot QA around `390px` width when the page is responsive
+- fix visible mismatches before continuing
 
-When the input is already a local `.html` file, skip the clone phase and go straight to generation.
+Do not auto-crawl an entire authenticated app unless the user clearly asks for that breadth. Prefer a curated set of key pages or states.
 
-Do NOT auto-crawl an entire authenticated app unless the user clearly asks for that breadth. Prefer a curated set of key pages or states.
+## Remix Rules
 
-## Run The Generator Script
+When adapting a cloned landing page to the current project:
 
-Use the bundled script:
+1. Inspect the current project folder for product context before writing copy. Prefer `README`, `PRODUCT.md`, `package.json`, existing landing pages, docs, source strings, screenshots, and brand assets.
+2. Run `scripts/extract_landing_inventory.py` on the verified clone to seed text and image planning.
+3. Build a copy map from original visible text to replacement text. Preserve the same content hierarchy and approximate text length so the layout stays intact.
+4. Replace brand names, headlines, subheads, CTAs, feature labels, testimonials, FAQ text, and footer copy with project-relevant language.
+5. Keep source layout, animation timing, section order, and component structure unless the user explicitly asks for structural changes.
+6. Inventory raster images, hero media, thumbnails, avatars, product mockups, and decorative photos.
+7. Use the `imagegen` skill for project-relevant raster replacements when the source imagery should not remain. Save generated assets into `landing-pages/<slug>/assets/generated/` and update HTML/CSS references.
+8. Prefer preserving original image dimensions, aspect ratios, crop behavior, object-fit, border radius, and visual weight.
+9. Do not replace simple SVG icons, vector marks, CSS gradients, or geometric decoration with generated bitmaps unless the user asks.
+10. Remove or replace third-party brand logos, names, screenshots, and trademarks unless the user explicitly wants them retained for a private reference clone.
+11. Verify the final adapted page in the browser after copy and image replacement. Fix text overflow, broken images, mobile wrapping, and layout shifts.
+
+## DESIGN.md Generation
+
+For design extraction mode, use the bundled script:
 
 ```bash
 python3 scripts/generate_design_md.py "$CLONE_HTML" \
@@ -131,8 +188,6 @@ python3 scripts/generate_design_md.py \
 
 Omit optional flags when you do not have those values.
 
-## Review Standard
-
 After generation:
 
 - read the produced `DESIGN.md`
@@ -148,9 +203,7 @@ Never invent:
 - interactions that require runtime state you did not capture
 - coverage claims for pages or flows you did not actually include in the session
 
-## Required Sections
-
-The final `DESIGN.md` should include:
+Required `DESIGN.md` sections:
 
 1. Visual Theme & Atmosphere
 2. Color Palette & Roles
@@ -164,7 +217,18 @@ The final `DESIGN.md` should include:
 
 ## Final Response
 
-Report:
+For landing remix mode, report:
+
+- source URL
+- capture folder and verified clone path
+- final landing page folder and `index.html`
+- what project files informed the replacement copy
+- how many copy replacements were made
+- how many generated images were created and where they were saved
+- desktop/mobile browser verification performed
+- any limitations, such as uncaptured interactions or assets that could not be replaced cleanly
+
+For design extraction mode, report:
 
 - where the capture folder was saved, if you cloned from a live URL
 - whether it contains one `clone.html` or several page folders with their own `clone.html`, and optionally `homepage.png` / `live.json`
